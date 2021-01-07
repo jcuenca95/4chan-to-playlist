@@ -43,7 +43,7 @@ export enum Name {
 
 export interface ViewInfo {
   title: string;
-  videos: string[];
+  videos: { embedded: string; url: string }[];
 }
 
 @Injectable()
@@ -58,7 +58,7 @@ export class AppService {
 
     const response = await this.httpClient.get<ThreadResponse>(url).toPromise();
 
-    const videos = new Array<string>();
+    const videos = new Array<{ embedded: string; url: string }>();
     for (const post of response.data.posts) {
       if (post.com) {
         const videosOnComment = this.analyzeComment(post.com);
@@ -72,7 +72,9 @@ export class AppService {
     };
   }
 
-  private analyzeComment(comment: string): Array<string> {
+  private analyzeComment(
+    comment: string,
+  ): Array<{ embedded: string; url: string }> {
     var youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
     const results = comment.match(youtubeRegex);
     return results
@@ -80,8 +82,11 @@ export class AppService {
       : [];
   }
 
-  private getYoutubeEmbedded(url: string): string {
+  private getYoutubeEmbedded(url: string): { embedded: string; url: string } {
     let id = url.slice(url.lastIndexOf('/') + 1);
-    return 'https://www.youtube.com/embed/' + id;
+    return {
+      embedded: 'https://www.youtube.com/embed/' + id,
+      url: 'https://' + url,
+    };
   }
 }

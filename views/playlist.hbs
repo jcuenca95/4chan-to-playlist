@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
+    <link rel="shortcut icon" href="//s.4cdn.org/image/favicon-ws.ico" type="image/x-icon">
     <style>
         .grid-container {
             display: grid;
@@ -40,7 +41,8 @@
     <div class="grid-container">
         {{#each videos}}
         <div class="grid-item">
-            <iframe src="{{this}}" frameborder="0"></iframe>
+            <iframe src="{{this.embedded}}" frameborder="0"></iframe>
+            <a href="{{this.url}}" target="_blank">{{this.url}}</a>
         </div>
         {{/each}}
     </div>
