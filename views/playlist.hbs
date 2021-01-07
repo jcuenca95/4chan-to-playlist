@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto;
+        }
+
+        .grid-item {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>{{title}}</h1>
+    <h6>{{videos.length}} videos</h6>
+    <div class="grid-container">
+        {{#each videos}}
+        <div class="grid-item">
+            <iframe src="{{this}}" frameborder="0"></iframe>
+        </div>
+        {{/each}}
+    </div>
+</body>
+
+</html>
