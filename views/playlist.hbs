@@ -36,6 +36,31 @@
         .display-none {
             display: none;
         }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: start;
+            align-items: auto;
+            align-content: start
+        }
+
+        .container:after {
+            display: block;
+            content: "";
+            margin: 3px;
+            flex: 999 999 auto;
+        }
+
+        .item {
+            flex: 1 0 auto;
+            margin: 3px;
+        }
+
+        .item>img {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -44,15 +69,15 @@
     <h6>{{videos.length}} videos</h6>
     <div id="player"></div>
     <br>
-    <ul>
+    <div class="container">
         {{#each videos}}
-        <li>
+        <div class="item">
             <span class="display-none video-id">{{this.id}}</span>
-            <a href="{{this.url}}" target="_blank">{{this.url}}</a>
-        </li>
+            <img src="https://img.youtube.com/vi/{{this.id}}/3.jpg" alt="{{this.url}}" video-id="{{this.id}}"
+                onclick="playVideoById(event)">
+        </div>
         {{/each}}
-    </ul>
-
+    </div>
 
     <script>
         var tag = document.createElement('script');
@@ -79,12 +104,9 @@
                 }
             });
         }
-
         function onPlayerReady(event) {
             event.target.playVideo();
         }
-
-
         function onPlayerStateChange(event) {
             if (event.data == YT.PlayerState.ENDED) {
                 playNextVideo();
@@ -95,6 +117,12 @@
         }
         function playNextVideo() {
             currentIndex++;
+            player.loadVideoById(videos[currentIndex], 0, "large")
+        }
+        function playVideoById(event) {
+            const id = event.currentTarget.getAttribute('video-id')
+            const index = videos.indexOf(id)
+            currentIndex = index;
             player.loadVideoById(videos[currentIndex], 0, "large")
         }
     </script>
