@@ -75,7 +75,20 @@ export class AppService {
   private analyzeComment(
     comment: string,
   ): Array<{ embedded: string; url: string }> {
-    var youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
+    comment = this.cleanComment(comment);
+    return this.getUrlsFromComment(comment);
+  }
+
+  private cleanComment(comment: string): string {
+    comment = comment.replace(/<wbr>/g, '');
+    comment = comment.replace(/<br>/g, ' ');
+    return comment;
+  }
+
+  private getUrlsFromComment(
+    comment: string,
+  ): Array<{ embedded: string; url: string }> {
+    const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)/g;
     const results = comment.match(youtubeRegex);
     return results
       ? results.map((result) => this.getYoutubeEmbedded(result))
@@ -83,10 +96,16 @@ export class AppService {
   }
 
   private getYoutubeEmbedded(url: string): { embedded: string; url: string } {
-    let id = url.slice(url.lastIndexOf('/') + 1);
+    const youtubeUrl = new URL(url);
+
+    let id = youtubeUrl.searchParams.get('v');
+    if (!id) {
+      const params = youtubeUrl.pathname.split('/');
+      id = params[params.length - 1];
+    }
     return {
       embedded: 'https://www.youtube.com/embed/' + id,
-      url: 'https://' + url,
+      url: youtubeUrl.toString(),
     };
   }
 }
