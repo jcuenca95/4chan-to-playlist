@@ -43,7 +43,13 @@ export enum Name {
 
 export interface ViewInfo {
   title: string;
-  videos: { embedded: string; url: string }[];
+  videos: VideoInfo[];
+}
+
+export interface VideoInfo {
+  embedded: string;
+  url: string;
+  id: string;
 }
 
 @Injectable()
@@ -58,7 +64,7 @@ export class AppService {
 
     const response = await this.httpClient.get<ThreadResponse>(url).toPromise();
 
-    const videos = new Array<{ embedded: string; url: string }>();
+    const videos = new Array<VideoInfo>();
     for (const post of response.data.posts) {
       if (post.com) {
         const videosOnComment = this.analyzeComment(post.com);
@@ -72,9 +78,7 @@ export class AppService {
     };
   }
 
-  private analyzeComment(
-    comment: string,
-  ): Array<{ embedded: string; url: string }> {
+  private analyzeComment(comment: string): Array<VideoInfo> {
     comment = this.cleanComment(comment);
     return this.getUrlsFromComment(comment);
   }
@@ -85,9 +89,7 @@ export class AppService {
     return comment;
   }
 
-  private getUrlsFromComment(
-    comment: string,
-  ): Array<{ embedded: string; url: string }> {
+  private getUrlsFromComment(comment: string): Array<VideoInfo> {
     const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)/g;
     const results = comment.match(youtubeRegex);
     return results
@@ -95,7 +97,7 @@ export class AppService {
       : [];
   }
 
-  private getYoutubeEmbedded(url: string): { embedded: string; url: string } {
+  private getYoutubeEmbedded(url: string): VideoInfo {
     const youtubeUrl = new URL(url);
 
     let id = youtubeUrl.searchParams.get('v');
@@ -106,6 +108,7 @@ export class AppService {
     return {
       embedded: 'https://www.youtube.com/embed/' + id,
       url: youtubeUrl.toString(),
+      id: id,
     };
   }
 }

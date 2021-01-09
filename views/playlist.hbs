@@ -32,20 +32,72 @@
             background: #eef2ff top center repeat-x;
             margin-right: 15%;
         }
+
+        .display-none {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <h1>{{title}}</h1>
     <h6>{{videos.length}} videos</h6>
-    <div class="grid-container">
+    <div id="player"></div>
+    <br>
+    <ul>
         {{#each videos}}
-        <div class="grid-item">
-            <iframe src="{{this.embedded}}" frameborder="0"></iframe>
+        <li>
+            <span class="display-none video-id">{{this.id}}</span>
             <a href="{{this.url}}" target="_blank">{{this.url}}</a>
-        </div>
+        </li>
         {{/each}}
-    </div>
+    </ul>
+
+
+    <script>
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var videos = [];
+        var currentIndex = 0;
+        function onYouTubeIframeAPIReady() {
+            const elements = document.getElementsByClassName('video-id')
+            for (element of elements) {
+                videos.push(element.innerHTML);
+            }
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: videos[currentIndex],
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                playNextVideo();
+            }
+        }
+        function stopVideo() {
+            player.stopVideo();
+        }
+        function playNextVideo() {
+            currentIndex++;
+            player.loadVideoById(videos[currentIndex], 0, "large")
+        }
+    </script>
 </body>
 
 </html>
